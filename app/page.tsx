@@ -4,10 +4,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Video, CalendarCheck, Clapperboard, ChevronRight, ArrowRight, CheckCircle2, Star, PlayCircle } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export default function LandingPage() {
   const targetRef = useRef<HTMLDivElement>(null);
+  const [stats, setStats] = useState({ clients: 0, completedTasks: 0, efficiency: 100 });
+  
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start end", "end start"]
@@ -15,6 +17,29 @@ export default function LandingPage() {
   
   const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 1, 0.3]);
+
+  useEffect(() => {
+    fetch("/api/clients")
+      .then(res => res.json())
+      .then(data => {
+        const clientsList = data.clients || [];
+        const totalClients = clientsList.length;
+        let completed = 0;
+        let total = 0;
+        clientsList.forEach((c: any) => {
+          total += c.tasks.length || 15;
+          completed += c.tasks.filter((t: any) => t.status === "completed").length;
+        });
+        const efficiency = total === 0 ? 100 : Math.round((completed / total) * 100);
+        
+        setStats({
+          clients: totalClients,
+          completedTasks: completed,
+          efficiency
+        });
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#050505] text-foreground flex flex-col overflow-hidden selection:bg-primary/30">
@@ -294,10 +319,10 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 md:divide-x divide-white/10">
               {[
-                { number: "150+", label: "Enterprise Clients" },
-                { number: "3,000+", label: "Videos Delivered" },
-                { number: "4.9/5", label: "Average Rating" },
-                { number: "99%", label: "Pipeline Efficiency" }
+                { number: stats.clients.toString(), label: "Enterprise Clients" },
+                { number: stats.completedTasks.toString(), label: "Tasks Completed" },
+                { number: "Countless", label: "Timeless Films" },
+                { number: `${stats.efficiency}%`, label: "Pipeline Efficiency" }
               ].map((stat, i) => (
                 <motion.div 
                   key={i}
