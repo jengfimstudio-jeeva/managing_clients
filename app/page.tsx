@@ -86,6 +86,10 @@ export default function LoginPageAsLanding() {
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
+
+            <p className="text-center text-sm text-white/50 pt-2">
+              Don't have an account? <Link href="/signup" className="text-primary hover:underline font-medium">Request access</Link>
+            </p>
           </motion.div>
         </div>
       </div>
