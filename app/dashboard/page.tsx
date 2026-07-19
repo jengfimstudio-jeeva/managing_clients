@@ -43,6 +43,17 @@ export default function DashboardPage() {
     }, 0) / totalClients * 100
   );
 
+  // Group clients by month
+  const groupedClients = clients.reduce((acc: any, client) => {
+    const date = new Date(client.createdAt || Date.now());
+    const monthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    if (!acc[monthYear]) {
+      acc[monthYear] = [];
+    }
+    acc[monthYear].push(client);
+    return acc;
+  }, {});
+
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -146,18 +157,29 @@ export default function DashboardPage() {
             </div>
           </motion.div>
         ) : (
-          <motion.div 
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          >
-            {clients.map(client => (
-              <motion.div key={client._id} variants={item}>
-                <ClientCard client={client} />
-              </motion.div>
+          <div className="space-y-12">
+            {Object.entries(groupedClients).map(([month, monthClients]: [string, any]) => (
+              <div key={month} className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-xl font-bold text-white/70">{month}</h3>
+                  <div className="h-px bg-white/10 flex-1" />
+                  <span className="text-sm font-medium text-white/40">{monthClients.length} {monthClients.length === 1 ? 'Client' : 'Clients'}</span>
+                </div>
+                <motion.div 
+                  variants={container}
+                  initial="hidden"
+                  animate="show"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                >
+                  {monthClients.map((client: any) => (
+                    <motion.div key={client._id} variants={item}>
+                      <ClientCard client={client} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
