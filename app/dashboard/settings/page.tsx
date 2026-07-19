@@ -109,46 +109,45 @@ export default function SettingsPage() {
         <motion.div variants={item}>
           <Card className="bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-2xl overflow-hidden">
             <CardHeader className="bg-white/[0.02] border-b border-white/5 pb-6">
-              <CardTitle className="text-2xl text-white">Studio Profile</CardTitle>
-              <CardDescription className="text-base text-white/50">Update your company details and administrative information.</CardDescription>
+              <CardTitle className="text-2xl text-white">Your Profile</CardTitle>
+              <CardDescription className="text-base text-white/50">Manage your personal account details and credentials.</CardDescription>
             </CardHeader>
             <CardContent className="pt-8">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <Label htmlFor="companyName" className="text-white/70">Company Name</Label>
+                  <Label htmlFor="userName" className="text-white/70">Full Name</Label>
                   <Input 
-                    id="companyName" 
-                    defaultValue="jengFilm Studio"
-                    className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label htmlFor="adminName" className="text-white/70">Admin Name</Label>
-                  <Input 
-                    id="adminName" 
+                    id="userName" 
                     defaultValue="Jeeva"
                     className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
                   />
                 </div>
                 <div className="space-y-3">
-                  <Label htmlFor="email" className="text-white/70">Contact Email</Label>
+                  <Label htmlFor="userEmail" className="text-white/70">Email Address</Label>
                   <Input 
-                    id="email" 
+                    id="userEmail" 
                     defaultValue="hello@jengfilm.com"
                     className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
                   />
                 </div>
-                <div className="space-y-3">
-                  <Label htmlFor="address" className="text-white/70">Studio Address</Label>
-                  <Input 
-                    id="address" 
-                    defaultValue="Los Angeles, CA"
-                    className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                  />
+                <div className="space-y-3 md:col-span-2">
+                  <Label className="text-white/70">Change Password</Label>
+                  <div className="flex gap-4">
+                    <Input 
+                      type="password"
+                      placeholder="New Password"
+                      className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                    />
+                    <Input 
+                      type="password"
+                      placeholder="Confirm Password"
+                      className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                    />
+                  </div>
                 </div>
               </div>
               <div className="pt-6">
-                <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8">Save Profile</Button>
+                <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8">Save Changes</Button>
               </div>
             </CardContent>
           </Card>
