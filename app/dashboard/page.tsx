@@ -55,7 +55,7 @@ export default function DashboardPage() {
   }, {});
 
   // Sort months in descending order (newest month first) so August automatically appears above July
-  const sortedMonths = Object.entries(groupedClients).sort(([monthA], [monthB]) => {
+  const sortedMonths = Object.entries(groupedClients).sort(([monthA]: [string, any], [monthB]: [string, any]) => {
     return new Date(monthB).getTime() - new Date(monthA).getTime();
   });
 

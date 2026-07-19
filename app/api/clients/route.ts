@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const packageId = searchParams.get('packageId');
     
-    let query = {};
+    let query: any = {};
     if (packageId) {
       query = { packageId };
     }
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
     }
 
     let clonedCount = 0;
-    for (const latestClient of latestClientsMap.values()) {
+    for (const latestClient of Array.from(latestClientsMap.values())) {
       const clientMonthYear = new Date(latestClient.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' });
       
       // If the latest record is from an older month, create a fresh one for this month!
