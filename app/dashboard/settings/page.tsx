@@ -172,8 +172,12 @@ export default function SettingsPage() {
             <CardContent className="pt-8">
               {!isEditingProfile ? (
                 <div className="flex items-center gap-6">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
-                    <UserIcon className="w-10 h-10 text-white" />
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden">
+                    {session?.user?.image ? (
+                      <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <UserIcon className="w-10 h-10 text-white" />
+                    )}
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-white">{profileName}</h3>

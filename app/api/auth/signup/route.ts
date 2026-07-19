@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, image } = await req.json();
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
@@ -24,6 +24,7 @@ export async function POST(req: Request) {
       name,
       email,
       passwordHash,
+      image: image || "",
       role: "admin", // default to admin as per instructions
     });
 

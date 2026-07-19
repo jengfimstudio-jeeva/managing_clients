@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [image, setImage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -24,7 +25,7 @@ export default function SignupPage() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, image }),
     });
 
     if (res.ok) {
@@ -34,6 +35,21 @@ export default function SignupPage() {
       const data = await res.json();
       toast({ title: "Signup Failed", description: data.error || "An error occurred", variant: "destructive" });
       setIsLoading(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 1024 * 1024) { // 1MB limit
+        toast({ title: "File too large", description: "Please select an image under 1MB", variant: "destructive" });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -85,6 +101,25 @@ export default function SignupPage() {
             </div>
 
             <form onSubmit={handleSignup} className="space-y-5">
+              <div className="flex flex-col items-center justify-center space-y-4 mb-4">
+                <div className="relative w-24 h-24 rounded-full border-2 border-white/20 border-dashed flex items-center justify-center overflow-hidden bg-white/5 cursor-pointer hover:bg-white/10 transition-colors">
+                  {image ? (
+                    <img src={image} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center">
+                      <span className="text-white/40 text-xs">Add Photo</span>
+                    </div>
+                  )}
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </div>
+                <Label className="text-xs text-white/50">Optional: Profile Picture</Label>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input 

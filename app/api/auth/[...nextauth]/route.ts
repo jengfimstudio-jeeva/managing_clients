@@ -21,7 +21,7 @@ const authOptions: NextAuthOptions = {
         const isMatch = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!isMatch) return null;
 
-        return { id: user._id.toString(), email: user.email, name: user.name, role: user.role };
+        return { id: user._id.toString(), email: user.email, name: user.name, image: user.image, role: user.role };
       }
     })
   ],
@@ -31,6 +31,7 @@ const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.picture = user.image || token.picture; // Ensure picture gets the image
       }
       return token;
     },
@@ -38,6 +39,7 @@ const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as any).id = token.id;
         (session.user as any).role = token.role;
+        session.user.image = token.picture as string | null | undefined;
       }
       return session;
     }
