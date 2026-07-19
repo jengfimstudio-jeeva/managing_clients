@@ -116,14 +116,16 @@ export default function LoginPage() {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="p-8 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10"
           >
-            <p className="text-xl font-medium text-white mb-4 leading-relaxed">
-              "Since migrating to jengFilm Studio, our post-production delivery speed increased by 40%. The 15-step pipeline is a game changer."
+            <p className="text-xl font-medium text-white mb-4 leading-relaxed italic">
+              "Where the most meaningful moments of your life become timeless films."
             </p>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-white/20" />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
+                <span className="text-white font-bold">J</span>
+              </div>
               <div>
-                <p className="text-white font-semibold">Sarah Jenkins</p>
-                <p className="text-white/50 text-sm">Lead Producer, Visuals Co.</p>
+                <p className="text-white font-semibold">Jeeva</p>
+                <p className="text-white/50 text-sm">Founder & CEO, JengFilm Studio</p>
               </div>
             </div>
           </motion.div>
