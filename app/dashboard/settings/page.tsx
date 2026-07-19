@@ -109,31 +109,46 @@ export default function SettingsPage() {
         <motion.div variants={item}>
           <Card className="bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-2xl overflow-hidden">
             <CardHeader className="bg-white/[0.02] border-b border-white/5 pb-6">
-              <CardTitle className="text-2xl text-white">Brand Identity</CardTitle>
-              <CardDescription className="text-base text-white/50">Update your company logo for the landing page and dashboard.</CardDescription>
+              <CardTitle className="text-2xl text-white">Studio Profile</CardTitle>
+              <CardDescription className="text-base text-white/50">Update your company details and administrative information.</CardDescription>
             </CardHeader>
             <CardContent className="pt-8">
-              <div className="flex items-center gap-8">
-                <div className="relative group cursor-pointer">
-                  <div className="w-32 h-32 rounded-2xl bg-black/40 border border-white/10 flex flex-col items-center justify-center text-white/30 overflow-hidden shadow-inner group-hover:border-primary/50 transition-colors">
-                    <Camera className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="text-xs font-semibold">Upload Logo</span>
-                    <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <Input id="logo-overlay" type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" onChange={handleLogoUpload} />
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <Label htmlFor="companyName" className="text-white/70">Company Name</Label>
+                  <Input 
+                    id="companyName" 
+                    defaultValue="jengFilm Studio"
+                    className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                  />
                 </div>
-                <div className="space-y-4 flex-1">
-                  <div>
-                    <h4 className="text-white font-medium mb-1">Company Logo</h4>
-                    <p className="text-sm text-white/40 leading-relaxed">This logo will be displayed on the login screen, landing page, and inside the dashboard navigation. Recommended size: 400x100px. Max size: 5MB.</p>
-                  </div>
-                  <Label htmlFor="logo" className="cursor-pointer inline-flex">
-                    <div className="flex items-center gap-2 bg-white/10 text-white px-5 py-2.5 rounded-lg border border-white/10 hover:bg-white/20 transition-colors font-medium">
-                      <Upload className="w-4 h-4" /> Browse Files
-                    </div>
-                  </Label>
-                  <Input id="logo" type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} />
+                <div className="space-y-3">
+                  <Label htmlFor="adminName" className="text-white/70">Admin Name</Label>
+                  <Input 
+                    id="adminName" 
+                    defaultValue="Jeeva"
+                    className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                  />
                 </div>
+                <div className="space-y-3">
+                  <Label htmlFor="email" className="text-white/70">Contact Email</Label>
+                  <Input 
+                    id="email" 
+                    defaultValue="hello@jengfilm.com"
+                    className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="address" className="text-white/70">Studio Address</Label>
+                  <Input 
+                    id="address" 
+                    defaultValue="Los Angeles, CA"
+                    className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                  />
+                </div>
+              </div>
+              <div className="pt-6">
+                <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8">Save Profile</Button>
               </div>
             </CardContent>
           </Card>

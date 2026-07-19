@@ -50,18 +50,15 @@ export default function LandingPage() {
       </header>
 
       <main className="flex-1 relative">
-        {/* Background Imagery & Ambient Glows */}
-        <div className="absolute top-0 left-0 w-full h-[800px] overflow-hidden -z-20">
+        {/* Clean Background Imagery */}
+        <div className="absolute top-0 left-0 w-full h-[600px] overflow-hidden -z-20">
           <img 
             src="https://images.unsplash.com/photo-1590608897129-79da98d15969?q=80&w=2070&auto=format&fit=crop" 
             alt="Cinematic background" 
-            className="w-full h-full object-cover opacity-20 object-top"
+            className="w-full h-full object-cover opacity-30 object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/80 to-[#050505]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/40 via-[#050505]/80 to-[#050505]" />
         </div>
-        
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none -z-10" />
-        <div className="absolute top-[20%] -left-[10%] w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none -z-10" />
 
         {/* Hero Section */}
         <section className="relative pt-40 pb-20 md:pt-52 md:pb-32 px-6 flex flex-col items-center justify-center text-center">
@@ -197,9 +194,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Detailed Feature Section with Parallax Image */}
-        <section id="pipeline" className="py-32 bg-[#0a0a0a] border-y border-white/5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
+        {/* Detailed Feature Section */}
+        <section id="pipeline" className="py-32 bg-[#050505] border-y border-white/5 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
@@ -260,9 +256,9 @@ export default function LandingPage() {
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.2 + 0.5 }}
                       whileHover={{ scale: 1.05 }}
-                      className={`p-5 rounded-2xl border flex items-center justify-between shadow-2xl backdrop-blur-xl transition-all ${
-                        step.state === 'done' ? 'bg-green-500/20 border-green-500/40' : 
-                        'bg-primary/30 border-primary/50'
+                      className={`p-5 rounded-2xl border flex items-center justify-between shadow-xl transition-all ${
+                        step.state === 'done' ? 'bg-[#0a0a0a] border-green-500/20' : 
+                        'bg-[#0a0a0a] border-primary/30'
                       }`}
                     >
                       <div className="flex items-center gap-4">
