@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
-import { hash } from "bcrypt";
+import { hash } from "bcryptjs";
 import { getServerSession } from "next-auth/next";
 
 export async function PUT(req: Request) {
