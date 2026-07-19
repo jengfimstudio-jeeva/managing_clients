@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Upload, Camera, Plus, Settings2, Trash2, Package as PackageIcon } from "lucide-react";
-import { motion } from "framer-motion";
+import { Plus, Settings2, Trash2, Package as PackageIcon, User as UserIcon, Moon, Sun, Bell } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
+import EditPackageModal from "@/components/EditPackageModal";
 
 export default function SettingsPage() {
   const { data: session, update } = useSession();
@@ -19,11 +20,15 @@ export default function SettingsPage() {
   const { toast } = useToast();
 
   // Profile State
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileName, setProfileName] = useState("");
   const [profileEmail, setProfileEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  // Theme State
+  const [theme, setTheme] = useState("dark");
 
   useEffect(() => {
     if (session?.user) {
@@ -31,6 +36,18 @@ export default function SettingsPage() {
       setProfileEmail(session.user.email || "hello@jengfilm.com");
     }
   }, [session]);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    toast({ title: "Theme Updated", description: `Switched to ${newTheme} mode.` });
+    // In a full implementation, this would trigger next-themes or a global context
+    if (newTheme === "light") {
+      document.documentElement.classList.add("light-theme-simulation");
+    } else {
+      document.documentElement.classList.remove("light-theme-simulation");
+    }
+  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,8 +75,8 @@ export default function SettingsPage() {
       toast({ title: "Success", description: "Profile updated successfully." });
       setNewPassword("");
       setConfirmPassword("");
-      // Force next-auth session to update client-side
       await update({ name: profileName, email: profileEmail });
+      setIsEditingProfile(false);
     } else {
       const data = await res.json();
       toast({ title: "Error", description: data.error || "Failed to update profile", variant: "destructive" });
@@ -137,59 +154,129 @@ export default function SettingsPage() {
       </motion.div>
 
       <motion.div variants={container} initial="hidden" animate="show" className="space-y-8">
+        
+        {/* Profile Settings */}
         <motion.div variants={item}>
           <Card className="bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-2xl overflow-hidden">
-            <CardHeader className="bg-white/[0.02] border-b border-white/5 pb-6">
-              <CardTitle className="text-2xl text-white">Your Profile</CardTitle>
-              <CardDescription className="text-base text-white/50">Manage your personal account details and credentials.</CardDescription>
+            <CardHeader className="bg-white/[0.02] border-b border-white/5 pb-6 flex flex-row justify-between items-center">
+              <div>
+                <CardTitle className="text-2xl text-white">Your Profile</CardTitle>
+                <CardDescription className="text-base text-white/50 mt-1">Manage your personal account details and credentials.</CardDescription>
+              </div>
+              {!isEditingProfile && (
+                <Button onClick={() => setIsEditingProfile(true)} variant="outline" className="border-white/10 text-white hover:bg-white/10">
+                  Edit Profile
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="pt-8">
-              <form onSubmit={handleUpdateProfile}>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <Label htmlFor="userName" className="text-white/70">Full Name</Label>
-                    <Input 
-                      id="userName" 
-                      value={profileName}
-                      onChange={(e) => setProfileName(e.target.value)}
-                      className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                    />
+              {!isEditingProfile ? (
+                <div className="flex items-center gap-6">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
+                    <UserIcon className="w-10 h-10 text-white" />
                   </div>
-                  <div className="space-y-3">
-                    <Label htmlFor="userEmail" className="text-white/70">Email Address</Label>
-                    <Input 
-                      id="userEmail" 
-                      value={profileEmail}
-                      onChange={(e) => setProfileEmail(e.target.value)}
-                      className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                    />
-                  </div>
-                  <div className="space-y-3 md:col-span-2">
-                    <Label className="text-white/70">Change Password</Label>
-                    <div className="flex gap-4">
-                      <Input 
-                        type="password"
-                        placeholder="New Password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                      />
-                      <Input 
-                        type="password"
-                        placeholder="Confirm Password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                      />
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{profileName}</h3>
+                    <p className="text-white/50 text-lg">{profileEmail}</p>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 mt-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wide">
+                      Administrator
                     </div>
                   </div>
                 </div>
-                <div className="pt-6">
-                  <Button type="submit" disabled={isUpdatingProfile} className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8">
-                    {isUpdatingProfile ? "Saving..." : "Save Changes"}
+              ) : (
+                <form onSubmit={handleUpdateProfile}>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <Label htmlFor="userName" className="text-white/70">Full Name</Label>
+                      <Input 
+                        id="userName" 
+                        value={profileName}
+                        onChange={(e) => setProfileName(e.target.value)}
+                        className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Label htmlFor="userEmail" className="text-white/70">Email Address</Label>
+                      <Input 
+                        id="userEmail" 
+                        value={profileEmail}
+                        onChange={(e) => setProfileEmail(e.target.value)}
+                        className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                      />
+                    </div>
+                    <div className="space-y-3 md:col-span-2">
+                      <Label className="text-white/70">Change Password (Optional)</Label>
+                      <div className="flex gap-4">
+                        <Input 
+                          type="password"
+                          placeholder="New Password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                        />
+                        <Input 
+                          type="password"
+                          placeholder="Confirm Password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pt-8 flex gap-4">
+                    <Button type="submit" disabled={isUpdatingProfile} className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8">
+                      {isUpdatingProfile ? "Saving..." : "Save Changes"}
+                    </Button>
+                    <Button type="button" variant="ghost" onClick={() => setIsEditingProfile(false)} className="text-white/70 hover:text-white h-11">
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* System Preferences */}
+        <motion.div variants={item}>
+          <Card className="bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-2xl overflow-hidden">
+            <CardHeader className="bg-white/[0.02] border-b border-white/5 pb-6">
+              <CardTitle className="text-2xl text-white">System Preferences</CardTitle>
+              <CardDescription className="text-base text-white/50 mt-1">Customize your workspace and notification settings.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+                      {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium">Appearance Theme</h4>
+                      <p className="text-sm text-white/40">Switch between dark and light modes</p>
+                    </div>
+                  </div>
+                  <Button onClick={toggleTheme} variant="outline" className="border-white/10 text-white hover:bg-white/10">
+                    Switch to {theme === 'dark' ? 'Light' : 'Dark'}
                   </Button>
                 </div>
-              </form>
+
+                <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 opacity-70">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
+                      <Bell className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium">Email Notifications</h4>
+                      <p className="text-sm text-white/40">Receive daily pipeline summaries</p>
+                    </div>
+                  </div>
+                  <Button disabled variant="outline" className="border-white/10 text-white/50 cursor-not-allowed">
+                    Coming Soon
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -240,7 +327,7 @@ export default function SettingsPage() {
           <Card className="bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-2xl overflow-hidden">
             <CardHeader className="bg-white/[0.02] border-b border-white/5 pb-6">
               <CardTitle className="text-2xl text-white">Manage Packages</CardTitle>
-              <CardDescription className="text-base text-white/50">View and delete existing service packages.</CardDescription>
+              <CardDescription className="text-base text-white/50">View, edit, and delete existing service packages.</CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-4">
@@ -258,13 +345,22 @@ export default function SettingsPage() {
                           <p className="text-sm text-white/40">{pkg.description || "No description"}</p>
                         </div>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        onClick={() => handleDeletePackage(pkg._id)}
-                        className="text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <EditPackageModal 
+                          pkg={pkg} 
+                          onUpdated={() => {
+                            fetchPackages();
+                            window.dispatchEvent(new Event("packagesUpdated"));
+                          }} 
+                        />
+                        <Button 
+                          variant="ghost" 
+                          onClick={() => handleDeletePackage(pkg._id)}
+                          className="text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </Button>
+                      </div>
                     </div>
                   ))
                 )}

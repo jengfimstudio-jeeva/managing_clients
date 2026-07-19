@@ -3,6 +3,23 @@ import dbConnect from "@/lib/mongodb";
 import Package from "@/models/Package";
 import Client from "@/models/Client";
 
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
+  try {
+    const { id } = params;
+    const data = await req.json();
+    await dbConnect();
+    
+    const updatedPackage = await Package.findByIdAndUpdate(id, data, { new: true });
+    if (!updatedPackage) {
+      return NextResponse.json({ error: "Package not found" }, { status: 404 });
+    }
+    
+    return NextResponse.json({ package: updatedPackage });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;

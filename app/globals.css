@@ -44,3 +44,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+.light-theme-simulation {
+  filter: invert(1) hue-rotate(180deg);
+  background: #fafafa;
+}
+
+.light-theme-simulation img, 
+.light-theme-simulation video, 
+.light-theme-simulation svg, 
+.light-theme-simulation .lucide {
+  filter: invert(1) hue-rotate(180deg);
+}

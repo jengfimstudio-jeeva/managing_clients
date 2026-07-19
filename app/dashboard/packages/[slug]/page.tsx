@@ -8,11 +8,13 @@ import TaskChecklist from "@/components/TaskChecklist";
 import { Download, Building2, MapPin, Phone, Mail, FolderOpen, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import EditClientModal from "@/components/EditClientModal";
 
 export default function PackagePage() {
   const { slug } = useParams();
   const [pkg, setPkg] = useState<any>(null);
   const [clients, setClients] = useState<any[]>([]);
+  const [allPackages, setAllPackages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedClient, setExpandedClient] = useState<string | null>(null);
 
@@ -20,6 +22,7 @@ export default function PackagePage() {
     setLoading(true);
     const pkgsRes = await fetch("/api/packages");
     const pkgsData = await pkgsRes.json();
+    setAllPackages(pkgsData.packages || []);
     const currentPkg = pkgsData.packages?.find((p: any) => p.slug === (Array.isArray(slug) ? slug[0] : slug));
     
     if (currentPkg) {
@@ -139,7 +142,7 @@ export default function PackagePage() {
                 <motion.div key={client._id} variants={item} id={`client-${client._id}`} className="scroll-mt-10">
                   <Card className="bg-white/[0.02] border border-white/10 backdrop-blur-md overflow-hidden hover:border-white/20 transition-colors shadow-2xl">
                     <CardHeader 
-                      className="bg-white/[0.02] border-b border-white/5 pb-6 cursor-pointer hover:bg-white/[0.04] transition-colors"
+                      className="bg-white/[0.02] border-b border-white/5 pb-6 cursor-pointer hover:bg-white/[0.04] transition-colors group/header"
                       onClick={() => setExpandedClient(expandedClient === client._id ? null : client._id)}
                     >
                       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
@@ -154,7 +157,7 @@ export default function PackagePage() {
                             <span className="w-1.5 h-1.5 rounded-full bg-primary" /> {client.customerName}
                           </CardDescription>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 md:gap-4">
                           <div className="flex items-center gap-6 bg-black/40 p-4 rounded-2xl border border-white/5">
                             <div className="text-right">
                               <div className="text-4xl font-black text-white">{completedTasks} <span className="text-xl font-medium text-white/30">/ {totalTasks}</span></div>
@@ -168,15 +171,20 @@ export default function PackagePage() {
                               <span className="text-sm font-bold text-white">{Math.round(progress)}%</span>
                             </div>
                           </div>
-                          <Button 
-                            variant="ghost" 
-                            onClick={(e) => handleDeleteClient(e, client._id)}
-                            className="h-16 w-12 flex items-center justify-center rounded-2xl text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </Button>
+                          
+                          <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-1">
+                            <EditClientModal client={client} packages={allPackages} onUpdated={fetchData} />
+                            <Button 
+                              variant="ghost" 
+                              onClick={(e) => handleDeleteClient(e, client._id)}
+                              className="h-10 w-10 md:h-16 md:w-12 flex items-center justify-center rounded-2xl text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </Button>
+                          </div>
+
                           <div className="text-white/30 ml-2">
-                            {expandedClient === client._id ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
+                            {expandedClient === client._id ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6 group-hover/header:translate-y-1 transition-transform" />}
                           </div>
                         </div>
                       </div>
