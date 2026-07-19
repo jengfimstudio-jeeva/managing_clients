@@ -4,11 +4,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Video, CalendarCheck, Clapperboard, ChevronRight, ArrowRight, CheckCircle2, Star, PlayCircle } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
-
+import { useRef } from "react";
+import { Infinity, Zap, Film, UserPlus } from "lucide-react";
 export default function LandingPage() {
   const targetRef = useRef<HTMLDivElement>(null);
-  const [stats, setStats] = useState({ clients: 0, completedTasks: 0, efficiency: 100 });
   
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -17,29 +16,6 @@ export default function LandingPage() {
   
   const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 1, 0.3]);
-
-  useEffect(() => {
-    fetch("/api/clients")
-      .then(res => res.json())
-      .then(data => {
-        const clientsList = data.clients || [];
-        const totalClients = clientsList.length;
-        let completed = 0;
-        let total = 0;
-        clientsList.forEach((c: any) => {
-          total += c.tasks.length || 15;
-          completed += c.tasks.filter((t: any) => t.status === "completed").length;
-        });
-        const efficiency = total === 0 ? 100 : Math.round((completed / total) * 100);
-        
-        setStats({
-          clients: totalClients,
-          completedTasks: completed,
-          efficiency
-        });
-      })
-      .catch(() => {});
-  }, []);
 
   return (
     <div className="min-h-screen bg-[#050505] text-foreground flex flex-col overflow-hidden selection:bg-primary/30">
@@ -310,30 +286,36 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* Value Proposition Section */}
         <section id="impact" className="py-32 relative overflow-hidden">
           <div className="absolute inset-0">
-            <img src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop" alt="Cinema" className="w-full h-full object-cover opacity-10" />
-            <div className="absolute inset-0 bg-[#050505]/90" />
+            <img src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop" alt="Cinema" className="w-full h-full object-cover opacity-5" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/95 to-[#050505]" />
           </div>
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 md:divide-x divide-white/10">
+          <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-16 text-white">
+              Why visionaries <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">choose us.</span>
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { number: stats.clients.toString(), label: "Enterprise Clients" },
-                { number: stats.completedTasks.toString(), label: "Tasks Completed" },
-                { number: "Countless", label: "Timeless Films" },
-                { number: `${stats.efficiency}%`, label: "Pipeline Efficiency" }
-              ].map((stat, i) => (
+                { title: "Unlimited Revisions", desc: "We don't stop editing until you are 100% satisfied with the final cut.", icon: Infinity, color: "text-blue-400", bg: "bg-blue-500/10" },
+                { title: "48-Hour Turnaround", desc: "Lightning fast initial cuts delivered directly to your dashboard.", icon: Zap, color: "text-amber-400", bg: "bg-amber-500/10" },
+                { title: "Cinema-Grade Quality", desc: "Full 4K and 8K delivery using industry standard color grading.", icon: Film, color: "text-purple-400", bg: "bg-purple-500/10" },
+                { title: "Dedicated Producer", desc: "Direct 1-on-1 communication with your lead video producer.", icon: UserPlus, color: "text-green-400", bg: "bg-green-500/10" }
+              ].map((prop, i) => (
                 <motion.div 
                   key={i}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, type: "spring" }}
-                  className="text-center flex flex-col items-center justify-center p-6 hover:bg-white/5 transition-colors rounded-3xl"
+                  className="flex flex-col items-center p-8 rounded-3xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group"
                 >
-                  <h4 className="text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tighter text-white mb-4 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">{stat.number}</h4>
-                  <p className="text-primary font-bold uppercase tracking-widest text-xs md:text-sm">{stat.label}</p>
+                  <div className={`w-16 h-16 rounded-2xl ${prop.bg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
+                    <prop.icon className={`w-8 h-8 ${prop.color}`} />
+                  </div>
+                  <h4 className="text-xl font-bold text-white mb-3">{prop.title}</h4>
+                  <p className="text-white/50 text-sm leading-relaxed">{prop.desc}</p>
                 </motion.div>
               ))}
             </div>
