@@ -54,6 +54,11 @@ export default function DashboardPage() {
     return acc;
   }, {});
 
+  // Sort months in descending order (newest month first) so August automatically appears above July
+  const sortedMonths = Object.entries(groupedClients).sort(([monthA], [monthB]) => {
+    return new Date(monthB).getTime() - new Date(monthA).getTime();
+  });
+
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -158,7 +163,7 @@ export default function DashboardPage() {
           </motion.div>
         ) : (
           <div className="space-y-12">
-            {Object.entries(groupedClients).map(([month, monthClients]: [string, any]) => (
+            {sortedMonths.map(([month, monthClients]: [string, any]) => (
               <div key={month} className="space-y-6">
                 <div className="flex items-center gap-4">
                   <h3 className="text-xl font-bold text-white/70">{month}</h3>

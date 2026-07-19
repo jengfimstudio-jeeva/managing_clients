@@ -14,8 +14,53 @@ export async function GET(req: Request) {
       query = { packageId };
     }
     
-    const clients = await Client.find(query).populate('packageId').sort({ createdAt: -1 });
-    return NextResponse.json({ clients });
+    const allClients = await Client.find(query).populate('packageId').sort({ createdAt: -1 });
+    
+    // --- Auto Rollover Logic ---
+    // Automatically duplicate clients into the new month with reset tasks (status 0)
+    const currentMonthYear = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+    const latestClientsMap = new Map();
+    
+    for (const client of allClients) {
+      const key = `${client.enterpriseName}-${client.customerName}`;
+      if (!latestClientsMap.has(key)) {
+        latestClientsMap.set(key, client);
+      }
+    }
+
+    let clonedCount = 0;
+    for (const latestClient of latestClientsMap.values()) {
+      const clientMonthYear = new Date(latestClient.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' });
+      
+      // If the latest record is from an older month, create a fresh one for this month!
+      if (clientMonthYear !== currentMonthYear) {
+        const resetTasks = latestClient.tasks.map((t: any) => ({
+          title: t.title,
+          status: "not_completed",
+          orderIndex: t.orderIndex
+        }));
+
+        await Client.create({
+          enterpriseName: latestClient.enterpriseName,
+          customerName: latestClient.customerName,
+          address: latestClient.address,
+          phone: latestClient.phone,
+          email: latestClient.email,
+          packageId: latestClient.packageId._id || latestClient.packageId,
+          tasks: resetTasks,
+          createdAt: new Date(), // New month timestamp
+        });
+        clonedCount++;
+      }
+    }
+
+    let finalClients = allClients;
+    if (clonedCount > 0) {
+      finalClients = await Client.find(query).populate('packageId').sort({ createdAt: -1 });
+    }
+    // ---------------------------
+
+    return NextResponse.json({ clients: finalClients });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
