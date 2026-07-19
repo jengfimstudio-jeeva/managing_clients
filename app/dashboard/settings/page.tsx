@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Settings2, Trash2, Package as PackageIcon, User as UserIcon, Moon, Sun, Bell } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Plus, Settings2, Trash2, Package as PackageIcon, User as UserIcon, Moon, Sun } from "lucide-react";
+import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import EditPackageModal from "@/components/EditPackageModal";
 
