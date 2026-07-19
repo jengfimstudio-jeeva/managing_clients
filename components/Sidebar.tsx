@@ -12,10 +12,16 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [packages, setPackages] = useState<any[]>([]);
 
-  useEffect(() => {
+  const fetchPackages = () => {
     fetch("/api/packages")
       .then(res => res.json())
       .then(data => setPackages(data.packages || []));
+  };
+
+  useEffect(() => {
+    fetchPackages();
+    window.addEventListener("packagesUpdated", fetchPackages);
+    return () => window.removeEventListener("packagesUpdated", fetchPackages);
   }, []);
 
   return (

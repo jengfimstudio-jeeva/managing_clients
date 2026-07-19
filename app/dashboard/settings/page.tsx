@@ -34,10 +34,11 @@ export default function SettingsPage() {
     });
 
     if (res.ok) {
-      toast({ title: "Success", description: "Custom package created. Please refresh the page to see it in the sidebar." });
+      toast({ title: "Success", description: "Custom package created successfully!" });
       setPackageName("");
       setPackageDesc("");
       fetchPackages();
+      window.dispatchEvent(new Event("packagesUpdated"));
     } else {
       toast({ title: "Error", description: "Failed to create package", variant: "destructive" });
     }
@@ -70,6 +71,7 @@ export default function SettingsPage() {
     if (res.ok) {
       toast({ title: "Success", description: "Package deleted successfully." });
       fetchPackages();
+      window.dispatchEvent(new Event("packagesUpdated"));
     } else {
       const data = await res.json();
       toast({ title: "Error", description: data.error || "Failed to delete package", variant: "destructive" });
