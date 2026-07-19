@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import TaskChecklist from "@/components/TaskChecklist";
-import { Download, Building2, MapPin, Phone, Mail, FolderOpen, Trash2 } from "lucide-react";
+import { Download, Building2, MapPin, Phone, Mail, FolderOpen, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -14,6 +14,7 @@ export default function PackagePage() {
   const [pkg, setPkg] = useState<any>(null);
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedClient, setExpandedClient] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -57,7 +58,8 @@ export default function PackagePage() {
     document.body.removeChild(link);
   };
 
-  const handleDeleteClient = async (id: string) => {
+  const handleDeleteClient = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
     if (!confirm("Are you sure you want to delete this client? This action cannot be undone.")) return;
     const res = await fetch(`/api/clients/${id}`, { method: "DELETE" });
     if (res.ok) {
@@ -136,7 +138,10 @@ export default function PackagePage() {
               return (
                 <motion.div key={client._id} variants={item} id={`client-${client._id}`} className="scroll-mt-10">
                   <Card className="bg-white/[0.02] border border-white/10 backdrop-blur-md overflow-hidden hover:border-white/20 transition-colors shadow-2xl">
-                    <CardHeader className="bg-white/[0.02] border-b border-white/5 pb-6">
+                    <CardHeader 
+                      className="bg-white/[0.02] border-b border-white/5 pb-6 cursor-pointer hover:bg-white/[0.04] transition-colors"
+                      onClick={() => setExpandedClient(expandedClient === client._id ? null : client._id)}
+                    >
                       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
                         <div>
                           <CardTitle className="text-3xl flex items-center gap-3 text-white">
@@ -165,15 +170,20 @@ export default function PackagePage() {
                           </div>
                           <Button 
                             variant="ghost" 
-                            onClick={() => handleDeleteClient(client._id)}
+                            onClick={(e) => handleDeleteClient(e, client._id)}
                             className="h-16 w-12 flex items-center justify-center rounded-2xl text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20"
                           >
                             <Trash2 className="w-5 h-5" />
                           </Button>
+                          <div className="text-white/30 ml-2">
+                            {expandedClient === client._id ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
+                          </div>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="pt-8 px-6 md:px-8">
+                    {expandedClient === client._id && (
+                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+                        <CardContent className="pt-8 px-6 md:px-8">
                       <div className="grid md:grid-cols-3 gap-6 mb-10">
                         <div className="flex items-center gap-4 text-white/60 bg-white/5 p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
                           <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
@@ -211,7 +221,9 @@ export default function PackagePage() {
                         <TaskChecklist client={client} onTaskUpdate={fetchData} />
                       </div>
                     </CardContent>
-                  </Card>
+                  </motion.div>
+                )}
+              </Card>
                 </motion.div>
               )
             })}
