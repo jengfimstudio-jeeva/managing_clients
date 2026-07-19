@@ -261,21 +261,6 @@ export default function SettingsPage() {
                     Switch to {theme === 'dark' ? 'Light' : 'Dark'}
                   </Button>
                 </div>
-
-                <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 opacity-70">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
-                      <Bell className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-white font-medium">Email Notifications</h4>
-                      <p className="text-sm text-white/40">Receive daily pipeline summaries</p>
-                    </div>
-                  </div>
-                  <Button disabled variant="outline" className="border-white/10 text-white/50 cursor-not-allowed">
-                    Coming Soon
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>
