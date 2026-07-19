@@ -8,12 +8,64 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Upload, Camera, Plus, Settings2, Trash2, Package as PackageIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 export default function SettingsPage() {
+  const { data: session, update } = useSession();
+  
   const [packageName, setPackageName] = useState("");
   const [packageDesc, setPackageDesc] = useState("");
   const [packages, setPackages] = useState<any[]>([]);
   const { toast } = useToast();
+
+  // Profile State
+  const [profileName, setProfileName] = useState("");
+  const [profileEmail, setProfileEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  useEffect(() => {
+    if (session?.user) {
+      setProfileName(session.user.name || "Jeeva");
+      setProfileEmail(session.user.email || "hello@jengfilm.com");
+    }
+  }, [session]);
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword && newPassword !== confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
+      return;
+    }
+    if (newPassword && newPassword.length < 6) {
+      toast({ title: "Error", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+
+    setIsUpdatingProfile(true);
+    const res = await fetch("/api/user/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: profileName,
+        email: profileEmail,
+        newPassword: newPassword || undefined
+      }),
+    });
+
+    if (res.ok) {
+      toast({ title: "Success", description: "Profile updated successfully." });
+      setNewPassword("");
+      setConfirmPassword("");
+      // Force next-auth session to update client-side
+      await update({ name: profileName, email: profileEmail });
+    } else {
+      const data = await res.json();
+      toast({ title: "Error", description: data.error || "Failed to update profile", variant: "destructive" });
+    }
+    setIsUpdatingProfile(false);
+  };
 
   const fetchPackages = async () => {
     const res = await fetch("/api/packages");
@@ -44,27 +96,6 @@ export default function SettingsPage() {
     }
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    toast({ title: "Uploading...", description: "Uploading logo to cloud storage..." });
-
-    const res = await fetch("/api/upload/logo", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (res.ok) {
-      toast({ title: "Success", description: "Logo uploaded successfully" });
-    } else {
-      toast({ title: "Error", description: "Logo upload failed", variant: "destructive" });
-    }
-  };
-
   const handleDeletePackage = async (id: string) => {
     if (!confirm("Are you sure you want to delete this package? Note: You cannot delete a package if it has active clients.")) return;
     const res = await fetch(`/api/packages/${id}`, { method: "DELETE" });
@@ -89,7 +120,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-10 max-w-4xl mx-auto">
+    <div className="space-y-10 max-w-4xl mx-auto pb-20">
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -113,42 +144,52 @@ export default function SettingsPage() {
               <CardDescription className="text-base text-white/50">Manage your personal account details and credentials.</CardDescription>
             </CardHeader>
             <CardContent className="pt-8">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <Label htmlFor="userName" className="text-white/70">Full Name</Label>
-                  <Input 
-                    id="userName" 
-                    defaultValue="Jeeva"
-                    className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label htmlFor="userEmail" className="text-white/70">Email Address</Label>
-                  <Input 
-                    id="userEmail" 
-                    defaultValue="hello@jengfilm.com"
-                    className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                  />
-                </div>
-                <div className="space-y-3 md:col-span-2">
-                  <Label className="text-white/70">Change Password</Label>
-                  <div className="flex gap-4">
+              <form onSubmit={handleUpdateProfile}>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="userName" className="text-white/70">Full Name</Label>
                     <Input 
-                      type="password"
-                      placeholder="New Password"
-                      className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
-                    />
-                    <Input 
-                      type="password"
-                      placeholder="Confirm Password"
+                      id="userName" 
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
                       className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
                     />
                   </div>
+                  <div className="space-y-3">
+                    <Label htmlFor="userEmail" className="text-white/70">Email Address</Label>
+                    <Input 
+                      id="userEmail" 
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
+                      className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                    />
+                  </div>
+                  <div className="space-y-3 md:col-span-2">
+                    <Label className="text-white/70">Change Password</Label>
+                    <div className="flex gap-4">
+                      <Input 
+                        type="password"
+                        placeholder="New Password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                      />
+                      <Input 
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="bg-white/5 border-white/10 h-12 text-white placeholder:text-white/20 focus-visible:ring-primary"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="pt-6">
-                <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8">Save Changes</Button>
-              </div>
+                <div className="pt-6">
+                  <Button type="submit" disabled={isUpdatingProfile} className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8">
+                    {isUpdatingProfile ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
         </motion.div>
