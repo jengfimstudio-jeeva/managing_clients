@@ -29,7 +29,11 @@ export async function GET(req: Request) {
     }
 
     let clonedCount = 0;
-    for (const latestClient of Array.from(latestClientsMap.values())) {
+    const latestClientsArray: any[] = [];
+    latestClientsMap.forEach((value) => latestClientsArray.push(value));
+    
+    for (let i = 0; i < latestClientsArray.length; i++) {
+      const latestClient = latestClientsArray[i];
       const clientMonthYear = new Date(latestClient.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' });
       
       // If the latest record is from an older month, create a fresh one for this month!
